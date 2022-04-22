@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: take-home-assignment
+
+logging.level.ROOT: DEBUG
+
+client:
+  userClient: "http://localhost:8898/marionete/user//"
+  accountClient: "http://localhost:8899/marionete/account//"
