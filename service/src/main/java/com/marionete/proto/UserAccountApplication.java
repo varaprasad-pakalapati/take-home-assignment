@@ -12,8 +12,13 @@ import java.io.IOException;
 @SpringBootApplication
 @EnableFeignClients
 public class UserAccountApplication {
-    public static void main (String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         SpringApplication.run(UserAccountApplication.class, args);
+        //Uncomment below code to run the service on local machine
+//        startLocalService();
+    }
+
+    private static void startLocalService() throws InterruptedException, IOException {
         UserInfoMock.start();
         AccountInfoMock.start();
         LoginServer server = new LoginServer(8980);

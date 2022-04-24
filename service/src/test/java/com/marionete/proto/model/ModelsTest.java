@@ -1,6 +1,5 @@
 package com.marionete.proto.model;
 
-import com.marionete.proto.services.TokenService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -45,12 +44,8 @@ public class ModelsTest {
 
     @Test
     void constructorTest() {
-        final Class<?>[] propertiesClasses = {
-                ErrorResponse.class
-        };
-        for (Class<?> propertiesClass : propertiesClasses)
-            assertPojoMethodsFor(propertiesClass).testing(
-                    Method.CONSTRUCTOR
-            ).areWellImplemented();
+        assertPojoMethodsFor(ErrorResponse.class).testing(
+                Method.CONSTRUCTOR
+        ).areWellImplemented();
     }
 }

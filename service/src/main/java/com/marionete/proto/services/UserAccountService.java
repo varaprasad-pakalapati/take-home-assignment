@@ -2,6 +2,8 @@ package com.marionete.proto.services;
 
 import com.marionete.proto.client.AccountClient;
 import com.marionete.proto.client.UserClient;
+import com.marionete.proto.exceptions.AccountClientException;
+import com.marionete.proto.exceptions.UserClientException;
 import com.marionete.proto.model.UserAccountRequest;
 import com.marionete.proto.model.UserAccountResponse;
 import lombok.AllArgsConstructor;
@@ -33,6 +35,11 @@ public class UserAccountService {
                         accountClient.getAccountInfo(token),
                 new TraceableExecutorService(this.beanFactory,
                         Executors.newCachedThreadPool()))
+                        .exceptionally(exception -> {
+                            log.error("Exception occurred while calling account client. Exception: {}",
+                                    exception.getMessage());
+                            throw new AccountClientException(exception.getMessage());
+                        })
                         .thenAcceptAsync(response -> {
                             if (response != null) {
                                 userAccountResponse.setAccountInfo(response);
@@ -42,6 +49,11 @@ public class UserAccountService {
                                 userClient.getUserInfo(token),
                         new TraceableExecutorService(this.beanFactory,
                                 Executors.newCachedThreadPool()))
+                        .exceptionally(exception -> {
+                            log.error("Exception occurred while calling user client. Exception: {}",
+                                    exception.getMessage());
+                            throw new UserClientException(exception.getMessage());
+                        })
                         .thenAcceptAsync(response -> {
                             if (response != null) {
                                 userAccountResponse.setUserInfo(response);

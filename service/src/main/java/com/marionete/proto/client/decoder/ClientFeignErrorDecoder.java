@@ -38,7 +38,6 @@ public class ClientFeignErrorDecoder implements ErrorDecoder {
         }
 
         if (status >= 500) {
-//            Date repeatAfter = new Date(currentTimeMillis() + 5);
             return new RetryableException(
                     response.status(),
                     exception.getMessage(),

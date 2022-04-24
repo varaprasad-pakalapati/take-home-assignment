@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 
+import java.util.concurrent.CompletionException;
+
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -39,7 +41,8 @@ public class ControllerAdvice {
         return errorResponse;
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({Exception.class,
+            CompletionException.class})
     public ErrorResponse internalServerError(Exception exception, HttpServletResponse response) {
         log.error(ENTRY_MESSAGE, exception.getClass().getName());
         ErrorResponse errorResponse = new ErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,

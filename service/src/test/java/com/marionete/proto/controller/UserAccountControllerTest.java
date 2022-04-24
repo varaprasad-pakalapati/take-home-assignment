@@ -15,12 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static com.marionete.proto.utils.Constants.USER_ACCOUNT_REQUEST_VALID;
-import static com.marionete.proto.utils.Constants.USER_ACCOUNT_RESPONSE_VALID;
+import static com.marionete.proto.utils.Constants.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,7 +46,7 @@ public class UserAccountControllerTest {
     }
 
     @Test
-    void shouldReturnBalanceTransferStatusSuccessfully() throws Exception {
+    void shouldReturnUserAccountInfoSuccessfully() throws Exception {
         final UserAccountRequest request = RequestResponseBuilder.builder().withBody(USER_ACCOUNT_REQUEST_VALID)
                 .buildUserAccountRequest();
         when(userAccountService.getUserAccountDetails(any()))
@@ -60,6 +59,83 @@ public class UserAccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(USER_ACCOUNT_RESPONSE_VALID));
+
+        then(userAccountService).should().getUserAccountDetails(refEq(RequestResponseBuilder.builder()
+                .withBody(USER_ACCOUNT_REQUEST_VALID).buildUserAccountRequest()));
+    }
+
+    @Test
+    void shouldReturnBadRequestMissingUsername() throws Exception {
+        final UserAccountRequest request = RequestResponseBuilder.builder().withBody(USER_ACCOUNT_REQUEST_MISSING_USERNAME)
+                .buildUserAccountRequest();
+
+        mockMvc.perform(post(URL)
+                .header("content-type", "application/json")
+                .content(new ObjectMapper().writeValueAsBytes(request))
+        ).andDo(logResultHandler)
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+        verify(userAccountService, never()).getUserAccountDetails(any());
+    }
+
+    @Test
+    void shouldReturnBadRequestNullUsername() throws Exception {
+        final UserAccountRequest request = RequestResponseBuilder.builder().withBody(USER_ACCOUNT_REQUEST_NULL_USERNAME)
+                .buildUserAccountRequest();
+
+        mockMvc.perform(post(URL)
+                .header("content-type", "application/json")
+                .content(new ObjectMapper().writeValueAsBytes(request))
+        ).andDo(logResultHandler)
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+        verify(userAccountService, never()).getUserAccountDetails(any());
+    }
+
+    @Test
+    void shouldReturnBadRequestMissingPassword() throws Exception {
+        final UserAccountRequest request = RequestResponseBuilder.builder().withBody(USER_ACCOUNT_REQUEST_MISSING_PASSWORD)
+                .buildUserAccountRequest();
+
+        mockMvc.perform(post(URL)
+                .header("content-type", "application/json")
+                .content(new ObjectMapper().writeValueAsBytes(request))
+        ).andDo(logResultHandler)
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+        verify(userAccountService, never()).getUserAccountDetails(any());
+    }
+
+    @Test
+    void shouldReturnBadRequestNullPassword() throws Exception {
+        final UserAccountRequest request = RequestResponseBuilder.builder().withBody(USER_ACCOUNT_REQUEST_NULL_PASSWORD)
+                .buildUserAccountRequest();
+
+        mockMvc.perform(post(URL)
+                .header("content-type", "application/json")
+                .content(new ObjectMapper().writeValueAsBytes(request))
+        ).andDo(logResultHandler)
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+        verify(userAccountService, never()).getUserAccountDetails(any());
+    }
+
+    @Test
+    void shouldReturnInternalServerErrorWhenServiceFails() throws Exception {
+        final UserAccountRequest request = RequestResponseBuilder.builder().withBody(USER_ACCOUNT_REQUEST_VALID)
+                .buildUserAccountRequest();
+        doThrow(RuntimeException.class).when(userAccountService).getUserAccountDetails(any());
+
+        mockMvc.perform(post(URL)
+                .header("content-type", "application/json")
+                .content(new ObjectMapper().writeValueAsBytes(request))
+        ).andDo(logResultHandler)
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
         then(userAccountService).should().getUserAccountDetails(refEq(RequestResponseBuilder.builder()
                 .withBody(USER_ACCOUNT_REQUEST_VALID).buildUserAccountRequest()));
